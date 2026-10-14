@@ -1,0 +1,11 @@
+[project]
+name = "autoresearch-democase"
+version = "0.1.0"
+requires-python = ">=3.13"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "modelscope>=1.40.2",
+    "pytrio>=0.2.9",
+    "swanlab>=0.10.2",
+    "transformers>=5.19.0",
+]
