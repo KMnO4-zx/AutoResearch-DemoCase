@@ -218,3 +218,11 @@ __marimo__/
 
 # Streamlit
 .streamlit/secrets.toml
+
+# Prepared datasets, experiment artifacts, and SwanLab logs
+/data/
+/runs/
+/swanlog/
+/results.jsonl
+/decisions.jsonl
+/best.json
