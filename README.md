@@ -1,5 +1,9 @@
 # AutoResearch-DemoCase
 
+![WorkBuddy 分支的 AIME25 pass@3 实验进展](assets/workbuddy-hy4-progress.png)
+
+本轮记录：1 次基线 + 10 次候选尝试，保留 3 次改进；AIME25 pass@3 从 **0.100（3/30）** 到 **0.233（7/30）**。
+
 一个用 PyTRIO 远程训练、SwanLab 记录实验的最小 AutoResearch 案例。目标是提升 **`Qwen/Qwen3.5-4B` 在 AIME25 上的 pass@3**，相对同一评测设置下的 4B 初始基线衡量进步。任何能修改文件、执行命令的 coding agent 都可以驱动实验。
 
 coding agent 可以自主进行 **1 次基线 + 最多 10 轮候选尝试**。纯 Prompt 修改、GRPO、SFT 和 OPD 都可以探索；有改进就 commit，下一轮从该 commit 修改，未改进则恢复到当前最佳 commit。
