@@ -183,7 +183,7 @@ def plot_progress(progress, output):
         ax.set_xticks([point["trial"] for point in points])
         ax.set_xlabel("Candidate attempt # (0 = baseline)")
         ax.set_ylabel("AIME25 pass@3 (higher is better)")
-        ax.set_title(f"AutoResearch-TRIO Progress: {len(points) - 1} Attempts, {len(kept)} Kept Improvements", pad=18)
+        ax.set_title(f"AutoResearch-PyTRIO Progress: {len(points) - 1} Attempts, {len(kept)} Kept Improvements", pad=18)
         protocol = progress["protocol"]
         ax.text(0.985, 0.985, f"Qwen3.5-4B | thinking {'on' if protocol['enable_thinking'] else 'off'} | seed {protocol['seed']}",
                 transform=ax.transAxes, ha="right", va="top", color="#777777", fontsize=9)
