@@ -49,14 +49,14 @@ uv run python prepare.py prepare --dapo-parquet /path/to/dapo-math-17k.parquet
 | 每轮训练数据 | 4 道题；GRPO 每题 2–4 条、OPD 每题 1–4 条回答，SFT 每题一个监督目标 |
 | 提示词实验 | 0 次权重更新，直接评测对应 prompt |
 | 评测集 | [math-ai/aime25](https://huggingface.co/datasets/math-ai/aime25)，全部 30 题 |
-| 评测 | 每题 3 条回答，每条最多 1024 输出 token，并发上限 16 道题 |
+| 评测 | 每题 3 条回答，每条最多 4096 输出 token，并发上限 16 道题 |
 | 固定采样参数 | temperature 0.8、top-p 1.0、按题目设置固定 seed |
 | 评测 thinking | `--eval-thinking` 开启，`--no-eval-thinking` 关闭；新实验默认关闭，同一比较中固定 |
 | 模型交互 | 单轮文本，无工具调用；训练模板默认关闭 thinking |
 
-`pass@3` 是三条回答至少有一条正确的题目比例；`average@3` 是全部 90 条回答的平均正确率。输出 token 上限包含模型生成的推理过程。另行记录格式率、达到长度上限的比例和停止原因；达到 1024 token 是长度上限指标，不直接等同于所有回答均被截断。
+`pass@3` 是三条回答至少有一条正确的题目比例；`average@3` 是全部 90 条回答的平均正确率。输出 token 上限包含模型生成的推理过程。另行记录格式率、达到长度上限的比例和停止原因；达到 4096 token 是长度上限指标，不直接等同于所有回答均被截断。
 
-评测代码在 `evaluation.py` 的 `evaluate()` 中，训练候选自动调用同一份实现。thinking 开关传给 tokenizer 的 `apply_chat_template(enable_thinking=...)`，实际设置保存在 `result.json` 的 `protocol.enable_thinking` 和 SwanLab 配置中，`summary` 也会显示。该开关只控制评测；开启后仍共享 1024 输出 token 预算。基线与候选必须使用相同开关；如果比较两种 thinking 设置，分别建立对应基线。
+评测代码在 `evaluation.py` 的 `evaluate()` 中，训练候选自动调用同一份实现。thinking 开关传给 tokenizer 的 `apply_chat_template(enable_thinking=...)`，实际设置保存在 `result.json` 的 `protocol.enable_thinking` 和 SwanLab 配置中，`summary` 也会显示。该开关只控制评测；开启后仍共享 4096 输出 token 预算。基线与候选必须使用相同开关；如果比较两种 thinking 设置，分别建立对应基线。
 
 GRPO 用同题回答的相对 reward 更新。OPD 用当前 student 采样，冻结 teacher 对同一条 student 轨迹计算逐 token logprob，再用 `-opd_kl_coef * (student_logprob - teacher_logprob)` 构造 advantage。OPD 的答案正确率只用于监控，损失信号来自 teacher。运行前检查双方 token vocabulary 的映射一致，保证 token ID 和 logprob 能对应。
 
@@ -68,7 +68,7 @@ SFT 默认监督 DAPO 的最终整数答案和 EOS，用于最小的答案/格�
 
 GRPO/OPD 每次更新前刷新 student sampler；无相对信号的组跳过，连续三个 batch 都没有有效组时提前停止。完整组的 advantage 算好后再拆 micro-batch，多个 backward 累积后只更新一次权重。SFT 只训练 assistant 目标 token，prompt 不进入 loss；所有方式共享 20 次权重更新上限。
 
-每轮在同一个 4B 基础模型上新建 LoRA，不续训上一轮候选。改进可以来自提示词、GRPO、SFT 或 OPD，最终都评测 4B student；代码会拒绝将其他模型替换为评测对象。20 step 是更新次数上限，实际耗时取决于远程排队、推理和训练。1k 输出和小题集适合演示闭环，实际收益需要基线与重复测量确认。搜索过程中 AIME25 承担开发集的角色。
+每轮在同一个 4B 基础模型上新建 LoRA，不续训上一轮候选。改进可以来自提示词、GRPO、SFT 或 OPD，最终都评测 4B student；代码会拒绝将其他模型替换为评测对象。20 step 是更新次数上限，实际耗时取决于远程排队、推理和训练。4k 输出和小题集适合演示闭环，实际收益需要基线与重复测量确认。搜索过程中 AIME25 承担开发集的角色。
 
 ## Skills 与 SwanLab
 
@@ -153,7 +153,7 @@ uv run python prepare.py summary
 
 可以这样给任意 coding agent 下指令：
 
-> 阅读 program.md，开始 AutoResearch，目标是提升 Qwen3.5-4B 的 AIME25 pass@3。先跑一次基线，再自主尝试最多 10 轮，允许纯 Prompt 优化、GRPO、SFT 和 OPD。允许使用 pytrio-skill 和 swanlab-skill。每个训练候选最多 20 step，evaluation thinking 关闭，保持 1k 输出与固定并发评测协议。每次接受改进都 commit，下一轮基于该 commit 修改，无改进就回退到当前最佳 commit。记录所有决策，结束后生成进展图。不要 push。
+> 阅读 program.md，开始 AutoResearch，目标是提升 Qwen3.5-4B 的 AIME25 pass@3。先跑一次基线，再自主尝试最多 10 轮，允许纯 Prompt 优化、GRPO、SFT 和 OPD。允许使用 pytrio-skill 和 swanlab-skill。每个训练候选最多 20 step，evaluation thinking 关闭，保持 4k 输出与固定并发评测协议。每次接受改进都 commit，下一轮基于该 commit 修改，无改进就回退到当前最佳 commit。记录所有决策，结束后生成进展图。不要 push。
 
 ## 不同 coding agent 使用不同分支
 

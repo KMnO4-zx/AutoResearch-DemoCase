@@ -332,7 +332,7 @@ def sft_sample(tokenizer, row, config):
         if eos and tokens[-len(eos):] != eos:
             tokens += eos
     if not tokens or len(tokens) > MAX_TOKENS:
-        raise ValueError("SFT target must fit the 1024-token budget, including EOS.")
+        raise ValueError(f"SFT target must fit the {MAX_TOKENS}-token budget, including EOS.")
     return {"prompt_tokens": prompt, "tokens": tokens, "correct": True,
             "formatted": True, "hit_max_tokens": len(tokens) == MAX_TOKENS,
             "answer_only": not bool(row.get("solution"))}

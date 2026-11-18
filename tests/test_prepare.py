@@ -269,7 +269,7 @@ class DataAndConfigTests(unittest.TestCase):
             p.grpo_datum(sample | {"logprobs": [None, -0.8]})
 
     def test_micro_batch_padded_area_is_bounded(self):
-        samples = [{"prompt_tokens": [1] * length, "tokens": [2] * 1024}
+        samples = [{"prompt_tokens": [1] * length, "tokens": [2] * p.MAX_TOKENS}
                    for length in [2048] * 16]
         batches = p.pack_samples(samples)
         self.assertEqual(sum(map(len, batches)), 16)
@@ -332,7 +332,7 @@ class AsyncContractTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(metrics["eval/generations"], 90)
         self.assertEqual(sampler.peak, 16)
         for n, params in sampler.calls:
-            self.assertEqual((n, params.max_tokens, params.temperature), (3, 1024, 0.8))
+            self.assertEqual((n, params.max_tokens, params.temperature), (3, 4096, 0.8))
 
     async def test_incomplete_group_and_over_budget_output_fail(self):
         for attribute in ("missing_sample", "over_budget"):
@@ -455,7 +455,7 @@ class LocalWorkflowTests(unittest.IsolatedAsyncioTestCase):
                 self.assertEqual(self.service.sampler.tokenizer.thinking_settings[-30:], [expected] * 30)
                 suffix = b"\n<think>" if expected else b"\n<think></think>"
                 self.assertTrue(all(bytes(prompt).endswith(suffix) for prompt in self.service.sampler.prompts[-30:]))
-                self.assertTrue(all(n == 3 and params.max_tokens == 1024
+                self.assertTrue(all(n == 3 and params.max_tokens == 4096
                                     for n, params in self.service.sampler.calls[-30:]))
                 # This is an evaluation-only switch; training keeps its own template behavior.
                 training = self.service.training_clients[-1]

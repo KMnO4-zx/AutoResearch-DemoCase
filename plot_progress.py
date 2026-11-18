@@ -56,8 +56,8 @@ def load_progress(root=ROOT, baseline_id=None):
             or baseline["base_model"] != "Qwen/Qwen3.5-4B"):
         raise ValueError("Select a completed prompt-only 4B base-model baseline.")
     protocol = baseline["protocol"]
-    if (protocol.get("rows"), protocol.get("n"), protocol.get("max_tokens")) != (30, 3, 1024):
-        raise ValueError("Baseline must use all 30 AIME25 problems, pass@3, and 1024 output tokens.")
+    if (protocol.get("rows"), protocol.get("n"), protocol.get("max_tokens")) != (30, 3, 4096):
+        raise ValueError("Baseline must use all 30 AIME25 problems, pass@3, and 4096 output tokens.")
     if type(protocol.get("enable_thinking")) is not bool:
         raise ValueError("Baseline must record its evaluation thinking setting.")
     best_score = score(baseline)

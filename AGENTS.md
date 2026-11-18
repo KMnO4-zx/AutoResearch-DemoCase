@@ -22,12 +22,12 @@ Follow [program.md](program.md) to drive the AutoResearch workflow.
 - Each training candidate starts from a fresh base-model LoRA and uses at most
   20 optimizer updates. Never continue training from the previous candidate.
   Use `mode="prompt"` for prompt-only evaluation on the base model.
-- Evaluate all 30 AIME25 questions with three samples per question, 1024 output
+- Evaluate all 30 AIME25 questions with three samples per question, 4096 output
   tokens per sample, and at most 16 problem requests in flight. Distinguish pass@3 from average@3.
 - Set evaluation thinking with `--eval-thinking` or `--no-eval-thinking` before
   the baseline, then keep it fixed for all comparable candidates. New runs
   default to off; re-evaluation inherits the source setting. Thinking tokens
-  count toward the same 1024-token budget.
+  count toward the same 4096-token budget.
 - Local tests may mock the model service in
   `tests/`; do not add fake outputs or smoke-only branches to production code.
 - Keep credentials in the SDK login store or environment. Do not copy them into

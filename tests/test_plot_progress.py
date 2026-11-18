@@ -23,7 +23,7 @@ def make_fixture(root):
                 "prepare_sha256": "fixed-utilities", "evaluation_sha256": "fixed-evaluation",
                 "data_sha256": {"aime25.jsonl": "fixed-data"},
                 "experiment": {"mode": "prompt", "hypothesis": "Initial prompt"},
-                "protocol": {"rows": 30, "n": 3, "max_tokens": 1024, "seed": 42, "enable_thinking": False},
+                "protocol": {"rows": 30, "n": 3, "max_tokens": 4096, "seed": 42, "enable_thinking": False},
                 "metrics": {"eval/pass_at_3": 12 / 30, "eval/problems": 30, "eval/generations": 90}}
     write_json(root / "runs" / "baseline" / "result.json", baseline)
     decisions = []

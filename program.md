@@ -74,10 +74,10 @@ If the agent does not support automatic skill discovery, read the installed
 | Code checkpoint | Commit each accepted improvement; discard restores latest accepted commit |
 | Training budget | At most 20 training rounds and 20 `optim_step` calls |
 | Training batch | 4 problems; GRPO 2–4 samples, OPD 1–4 samples, SFT one target per problem |
-| Training/target output budget | At most 1024 tokens per completion/target, including EOS |
+| Training/target output budget | At most 4096 tokens per completion/target, including EOS |
 | Early stopping | Stop after 3 consecutive batches without relative reward signal |
 | Evaluation | All 30 AIME25 problems, 3 samples per problem |
-| Output budget | 1024 tokens per answer, including generated reasoning |
+| Output budget | 4096 tokens per answer, including generated reasoning |
 | Evaluation sampling | Temperature 0.8, top-p 1.0, seed 42 + problem index |
 | Evaluation concurrency | At most 16 problem requests in flight |
 | Evaluation thinking | Choose on/off before the baseline; fixed throughout a comparable series |
@@ -90,7 +90,7 @@ samples require stochastic decoding; do not change evaluation temperature to 0.
 Use `--eval-thinking` or `--no-eval-thinking` to select the evaluation template.
 New experiments default to thinking off; re-evaluation inherits the source run's
 setting unless explicitly overridden. Generated reasoning counts toward the
-same 1024-token output budget. Record and compare `protocol.enable_thinking`;
+same 4096-token output budget. Record and compare `protocol.enable_thinking`;
 changing it requires a separate baseline and comparison series.
 
 ## Experiment loop
